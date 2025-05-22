@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+import sentry_sdk
+from app.config import settings
 
 app = FastAPI()
 
@@ -11,6 +13,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+sentry_sdk.init(
+    dsn=settings.SENTRY_DSN,
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+)
+
 @app.get('/')
 def home():
     return {"message": 'Home', 'status': 200}
+
+@app.get("/sentry-debug")
+async def trigger_error():
+    division_by_zero = 1 / 0
