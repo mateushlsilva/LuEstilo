@@ -5,7 +5,7 @@ from app.config import settings
 from app.database import Database
 from sqlalchemy.orm import Session
 from app.schemas import clienteSchema
-from app.routers import authRouter
+from app.routers import authRouter, clienteRouter
 
 app = FastAPI()
 
@@ -25,6 +25,7 @@ sentry_sdk.init(
 )
 
 app.include_router(authRouter.router)
+app.include_router(clienteRouter.router)
 
 db = Database()
 

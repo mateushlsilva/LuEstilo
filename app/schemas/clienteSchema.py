@@ -8,6 +8,9 @@ class ClienteBase(BaseModel):
     nome: str
     senha: str
 
+class ClienteRemove(BaseModel):
+    detail: str
+
 class ClienteRead(ClienteBase):
     id: int
 
