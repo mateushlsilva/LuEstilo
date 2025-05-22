@@ -11,6 +11,7 @@ class UserRegister(ClienteBase):
 class UserLogin(BaseModel):
     nome: str
     senha: str
+    email: str
 
 class Token(BaseModel):
     access_token: str

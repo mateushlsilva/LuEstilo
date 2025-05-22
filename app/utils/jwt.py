@@ -2,7 +2,7 @@ import jwt
 from datetime import datetime, timedelta, timezone
 from app.config import settings
 
-class Jwt:
+class Jwt():
     def __init__(self):
         pass
 
