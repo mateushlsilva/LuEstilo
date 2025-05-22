@@ -4,6 +4,7 @@ import sentry_sdk
 from app.config import settings
 from app.database import Database
 from sqlalchemy.orm import Session
+from app.schemas import clienteSchema
 
 app = FastAPI()
 
@@ -27,6 +28,11 @@ db = Database()
 @app.get('/')
 def home(db: Session = Depends(db.get_db)):
     return {"message": 'Home', 'status': 200}
+
+
+@app.post("/test/cliente")
+def test_cliente(cliente: clienteSchema.ClienteBase):
+    return {"message": "Cliente recebido com sucesso!", "dados": cliente}
 
 @app.get("/sentry-debug")
 async def trigger_error():
