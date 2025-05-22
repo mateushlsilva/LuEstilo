@@ -17,6 +17,7 @@ class Database:
         except Exception as e:
             print("❌ Erro ao conectar no banco de dados:")
             print(e)
+            raise
         finally:
             db.close()
         
