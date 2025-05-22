@@ -7,7 +7,7 @@ class Database:
     def __init__(self):
         self.engine = create_engine(settings.SQLALCHEMY_DATABASE_URL, echo=True)
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-        self.Base = declarative_base()
+        
 
     def get_db(self) -> Generator[Session, None, None]:
         db = self.SessionLocal()
@@ -20,3 +20,4 @@ class Database:
         finally:
             db.close()
         
+Base = declarative_base()
