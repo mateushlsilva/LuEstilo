@@ -2,6 +2,8 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import sentry_sdk
 from app.config import settings
+from app.database import Database
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 
@@ -20,8 +22,10 @@ sentry_sdk.init(
     send_default_pii=True,
 )
 
+db = Database()
+
 @app.get('/')
-def home():
+def home(db: Session = Depends(db.get_db)):
     return {"message": 'Home', 'status': 200}
 
 @app.get("/sentry-debug")
