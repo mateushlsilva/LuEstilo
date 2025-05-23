@@ -49,8 +49,30 @@ class ProdutoService:
     def pegar_produto_id(self, db: Session, id: int):
         return db.query(Produto).filter(Produto.id == id).first()
 
-    def alterar_produto(self):
-        pass
+    def alterar_produto(self, db: Session, id: int, dados: ProdutoBase):
+        produto = db.query(Produto).filter(Produto.id == id).first()
+        if not produto:
+            return None
+
+        if produto.codigo_barras != dados.codigo_barras:
+            if db.query(Produto).filter(Produto.codigo_barras == dados.codigo_barras).first():
+                raise ValueError("Código de Barras já está em uso.")
+
+       
+        produto.codigo_barras = dados.codigo_barras
+        produto.preco = dados.preco
+        produto.categoria = dados.categoria
+        produto.disponibilidade = dados.disponibilidade
+        produto.descricao = dados.descricao
+        produto.valor_venda = dados.valor_venda
+        produto.secao = dados.secao
+        produto.estoque_inicial = dados.estoque_inicial
+        produto.data_validade = dados.data_validade
+        produto.imagens = dados.imagens
+
+        db.commit()
+        db.refresh(produto)
+        return produto
 
     def deletar_produto(self, db: Session, id):
         produto = db.query(Produto).filter(Produto.id == id).first()

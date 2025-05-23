@@ -46,3 +46,16 @@ def deletar_produto(id: int, db: Session = Depends(db.get_db)):
     if not produto:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
     return {"detail": 'Produto deletado!'}
+
+
+@router.put("/{id}", response_model=ProdutoRead)
+def atualizar_produto(id: int, produto: ProdutoBase, db: Session = Depends(db.get_db)):
+    try:   
+        produto_atualizado = service.alterar_produto(db, id, produto)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if not produto_atualizado:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+
+    return produto_atualizado
