@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from datetime import date
 
 class ProdutoBase(BaseModel):
@@ -12,7 +12,7 @@ class ProdutoBase(BaseModel):
     secao: Optional[str]
     estoque_inicial: int
     data_validade: Optional[date]
-    imagens: Optional[str]
+    imagens: Optional[List[str]]
 
 
 class ProdutoRead(ProdutoBase):
