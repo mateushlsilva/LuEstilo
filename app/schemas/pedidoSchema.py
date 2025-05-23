@@ -25,6 +25,8 @@ class PedidoItemRead(BaseModel):
     class Config:
         orm_mode = True
 
+class PedidoRemove(BaseModel):
+    detail: str
 
 class PedidoRead(PedidoBase):
     id_pedido: int

@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from app.database import Database
 from app.services.pedidoService import PedidoService
-from app.schemas.pedidoSchema import PedidoBase, PedidoRead, PedidoCreate
+from app.schemas.pedidoSchema import PedidoBase, PedidoRead, PedidoCreate, PedidoRemove
 
 router = APIRouter(prefix="/orders", tags=["Pedidos"])
 service = PedidoService()
@@ -28,3 +28,17 @@ def listar_pedidos(
     db: Session = Depends(db.get_db)
 ):
     return service.pegar_todos_pedidos(db, periodo, secao_produtos, id_pedido, status, cliente, skip, limit)
+
+@router.get("/{id}", response_model=PedidoRead)
+def buscar_pedidos(id: int, db: Session = Depends(db.get_db)):
+    pedidos = service.pegar_pedidos_id(db, id)
+    if not pedidos:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    return pedidos
+
+@router.delete("/{id}",  response_model=PedidoRemove)
+def deletar_pedido(id: int, db: Session = Depends(db.get_db)):
+    pedido = service.deletar_pedido(db, id)
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    return {"detail": 'Pedido deletado!'}

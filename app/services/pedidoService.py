@@ -72,11 +72,17 @@ class PedidoService:
 
         return query.offset(skip).limit(limit).all()
 
-    def pegar_pedidos_id(self):
-        pass
+    def pegar_pedidos_id(self, db: Session, id: int):
+        return db.query(Pedido).filter(Pedido.id_pedido == id).first()
 
     def alterar_pedido(self): 
         pass
 
-    def deletar_pedido(self):
-        pass
+    def deletar_pedido(self, db: Session, id: int):
+        pedido = db.query(Pedido).filter(Pedido.id_pedido == id).first()
+        if not pedido:
+            return None
+
+        db.delete(pedido)
+        db.commit()
+        return True
