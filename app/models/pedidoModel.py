@@ -7,9 +7,9 @@ class Pedido(Base):
 
     id_pedido = Column(Integer, primary_key=True, index=True, autoincrement=True)
     id_cliente = Column(Integer, ForeignKey("clientes.id"), nullable=False)
-    id_produto = Column(Integer, ForeignKey("produtos.id"), nullable=False)
     periodo = Column(String, nullable=True)
     secao_produtos = Column(String, nullable=True)
     status = Column(String, nullable=False)
     cliente = relationship("Cliente")
-    produto = relationship("Produto")
+    itens = relationship("PedidoItem", back_populates="pedido", cascade="all, delete-orphan")
+    

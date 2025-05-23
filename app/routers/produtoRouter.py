@@ -8,7 +8,7 @@ from app.services.produtoService import ProdutoService
 from app.models.produtoModel import Produto
 from app.utils.validated import Validadores
 
-router = APIRouter(prefix="/produtos", tags=["Produtos"])
+router = APIRouter(prefix="/products", tags=["Produtos"])
 service = ProdutoService()
 db = Database()
 

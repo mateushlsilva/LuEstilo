@@ -8,7 +8,7 @@ from app.database import Base
 
 from sqlalchemy import create_engine
 from app.config import settings  
-from app.models import clientesModel, pedidoModel, produtoModel
+from app.models import clientesModel, pedidoModel, produtoModel, pedido_item
 
 
 # this is the Alembic Config object, which provides
