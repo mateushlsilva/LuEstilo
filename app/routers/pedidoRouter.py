@@ -5,8 +5,10 @@ from typing import List, Optional
 from app.database import Database
 from app.services.pedidoService import PedidoService
 from app.schemas.pedidoSchema import PedidoBase, PedidoRead, PedidoCreate, PedidoRemove, PedidoStatus
+from app.middleware.Authorization import Authorization
 
-router = APIRouter(prefix="/orders", tags=["Pedidos"])
+auth = Authorization()
+router = APIRouter(prefix="/orders", tags=["Pedidos"], dependencies=[Depends(auth)])
 service = PedidoService()
 db = Database()
 

@@ -7,8 +7,10 @@ from app.schemas.clienteSchema import ClienteBase, ClienteRead, ClienteRemove
 from app.services.clienteService import ClienteService
 from app.models.clientesModel import Cliente
 from app.utils.validated import Validadores
+from app.middleware.Authorization import Authorization
 
-router = APIRouter(prefix="/clients", tags=["Clientes"])
+auth = Authorization()
+router = APIRouter(prefix="/clients", tags=["Clientes"], dependencies=[Depends(auth)])
 service = ClienteService()
 db = Database()
 
@@ -20,7 +22,7 @@ def listar_clientes(
     skip: int = 0,
     limit: int = 10,
     db: Session = Depends(db.get_db)
-):
+):  
     return service.pegar_todos_clientes(db, nome, email, skip, limit)
 
 @router.get("/{id}", response_model=ClienteRead)

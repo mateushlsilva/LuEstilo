@@ -10,3 +10,4 @@ class Cliente(Base):
     cpf = Column(String, unique=True, index=True, nullable=False)
     telefone = Column(String, nullable=False)
     senha = Column(String, nullable=False)
+    nivel = Column(String, nullable=False, default='comum')

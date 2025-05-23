@@ -1,11 +1,9 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import sentry_sdk
 from app.config import settings
-from app.database import Database
-from sqlalchemy.orm import Session
-from app.schemas import clienteSchema
 from app.routers import authRouter, clienteRouter, produtoRouter, pedidoRouter
+
 
 app = FastAPI()
 
@@ -28,13 +26,3 @@ app.include_router(authRouter.router)
 app.include_router(clienteRouter.router)
 app.include_router(produtoRouter.router)
 app.include_router(pedidoRouter.router)
-
-db = Database()
-
-@app.get('/')
-def home(db: Session = Depends(db.get_db)):
-    return {"message": 'Home', 'status': 200}
-
-@app.get("/sentry-debug")
-async def trigger_error():
-    division_by_zero = 1 / 0

@@ -7,6 +7,7 @@ class ClienteBase(BaseModel):
     telefone: str
     nome: str
     senha: str
+    nivel: str
 
 class ClienteRemove(BaseModel):
     detail: str

@@ -7,8 +7,10 @@ from app.schemas.produtoSchema import ProdutoBase, ProdutoRead, ProdutoRemove
 from app.services.produtoService import ProdutoService
 from app.models.produtoModel import Produto
 from app.utils.validated import Validadores
+from app.middleware.Authorization import Authorization
 
-router = APIRouter(prefix="/products", tags=["Produtos"])
+auth = Authorization()
+router = APIRouter(prefix="/products", tags=["Produtos"], dependencies=[Depends(auth)])
 service = ProdutoService()
 db = Database()
 
