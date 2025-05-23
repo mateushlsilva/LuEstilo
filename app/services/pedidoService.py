@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.pedidoModel import Pedido
 from app.models.pedido_item import PedidoItem
 from app.models.produtoModel import Produto
+from app.models.clientesModel import Cliente
 from app.schemas.pedidoSchema import PedidoBase, PedidoRead, PedidoCreate
 from typing import Optional
 from fastapi import HTTPException
@@ -42,8 +43,34 @@ class PedidoService:
         db.refresh(novo_pedido)
         return novo_pedido
 
-    def pegar_todos_pedidos(self):
-        pass
+    def pegar_todos_pedidos(
+        self,
+        db: Session,
+        periodo: Optional[str],
+        secao_produtos: Optional[str],
+        id_pedido: Optional[int],
+        status: Optional[str],
+        cliente: Optional[str],
+        skip: int,
+        limit: int
+    ):
+        query = db.query(Pedido)
+
+        filtros = {
+            Pedido.periodo.ilike(f"%{periodo}%") if periodo else None,
+            Pedido.secao_produtos.ilike(f"%{secao_produtos}%") if secao_produtos else None,
+            Pedido.id_pedido == id_pedido if id_pedido else None,
+            Pedido.status.ilike(f"%{status}%") if status else None,
+        }
+
+        for filtro in filtros:
+            if filtro is not None:
+                query = query.filter(filtro)
+
+        if cliente:
+            query = query.join(Pedido.cliente).filter(Cliente.nome.ilike(f"%{cliente}%"))
+
+        return query.offset(skip).limit(limit).all()
 
     def pegar_pedidos_id(self):
         pass

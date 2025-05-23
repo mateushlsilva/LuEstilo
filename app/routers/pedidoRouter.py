@@ -14,3 +14,17 @@ db = Database()
 def criar_pedido(pedidos: PedidoCreate, db: Session = Depends(db.get_db)):
     novo_pedido = service.criar_pedido(db, pedidos)
     return novo_pedido
+
+
+@router.get("/", response_model=List[PedidoRead])
+def listar_pedidos(
+    periodo: Optional[str] = Query(None),
+    secao_produtos: Optional[str] = Query(None),
+    id_pedido: Optional[int] = Query(None),
+    status: Optional[str] = Query(None),
+    cliente: Optional[str] = Query(None),
+    skip: int = 0,
+    limit: int = 10,
+    db: Session = Depends(db.get_db)
+):
+    return service.pegar_todos_pedidos(db, periodo, secao_produtos, id_pedido, status, cliente, skip, limit)
