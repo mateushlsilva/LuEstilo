@@ -15,6 +15,9 @@ class ProdutoBase(BaseModel):
     imagens: Optional[List[str]]
 
 
+class ProdutoRemove(BaseModel):
+    detail: str
+
 class ProdutoRead(ProdutoBase):
     id: int
 

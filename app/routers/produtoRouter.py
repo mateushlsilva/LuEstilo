@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from app.database import Database
-from app.schemas.produtoSchema import ProdutoBase, ProdutoRead
+from app.schemas.produtoSchema import ProdutoBase, ProdutoRead, ProdutoRemove
 from app.services.produtoService import ProdutoService
 from app.models.produtoModel import Produto
 from app.utils.validated import Validadores
@@ -14,7 +14,7 @@ db = Database()
 
 
 @router.get("/", response_model=List[ProdutoRead])
-def listar_clientes(
+def listar_produtos(
     categoria: Optional[str] = Query(None), 
     preco: Optional[float] = Query(None) , 
     disponibilidade: Optional[bool] = Query(None),
@@ -24,11 +24,25 @@ def listar_clientes(
 ):
     return service.pegar_todos_produtos(db, categoria, preco, disponibilidade, skip, limit)
 
+@router.get("/{id}", response_model=ProdutoRead)
+def buscar_produto(id: int, db: Session = Depends(db.get_db)):
+    produto = service.pegar_produto_id(db, id)
+    if not produto:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    return produto
+
 @router.post("/", response_model=ProdutoRead)
-def criar_cliente(produto: ProdutoBase, db: Session = Depends(db.get_db)):
+def criar_produto(produto: ProdutoBase, db: Session = Depends(db.get_db)):
    
     if db.query(Produto).filter_by(codigo_barras=produto.codigo_barras).first():
         raise HTTPException(status_code=400, detail="Código de barras já cadastrado!")
 
     novo_produto = service.criar_produto(db, produto)
     return novo_produto
+
+@router.delete("/{id}",  response_model=ProdutoRemove)
+def deletar_produto(id: int, db: Session = Depends(db.get_db)):
+    produto = service.deletar_produto(db, id)
+    if not produto:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    return {"detail": 'Produto deletado!'}

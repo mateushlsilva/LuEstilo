@@ -46,11 +46,17 @@ class ProdutoService:
         
         return query.offset(skip).limit(limit).all()
 
-    def pegar_produto_id(self):
-        pass
+    def pegar_produto_id(self, db: Session, id: int):
+        return db.query(Produto).filter(Produto.id == id).first()
 
     def alterar_produto(self):
         pass
 
-    def deletar_produto(self):
-        pass
+    def deletar_produto(self, db: Session, id):
+        produto = db.query(Produto).filter(Produto.id == id).first()
+        if not produto:
+            return None
+
+        db.delete(produto)
+        db.commit()
+        return True
