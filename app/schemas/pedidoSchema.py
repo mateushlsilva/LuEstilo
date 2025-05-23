@@ -28,6 +28,9 @@ class PedidoItemRead(BaseModel):
 class PedidoRemove(BaseModel):
     detail: str
 
+class PedidoStatus(BaseModel):
+    status: str
+
 class PedidoRead(PedidoBase):
     id_pedido: int
     cliente: clienteSchema.ClienteRead

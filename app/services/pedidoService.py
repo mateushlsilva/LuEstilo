@@ -3,7 +3,7 @@ from app.models.pedidoModel import Pedido
 from app.models.pedido_item import PedidoItem
 from app.models.produtoModel import Produto
 from app.models.clientesModel import Cliente
-from app.schemas.pedidoSchema import PedidoBase, PedidoRead, PedidoCreate
+from app.schemas.pedidoSchema import PedidoBase, PedidoRead, PedidoCreate, PedidoStatus
 from typing import Optional
 from fastapi import HTTPException
 
@@ -75,8 +75,60 @@ class PedidoService:
     def pegar_pedidos_id(self, db: Session, id: int):
         return db.query(Pedido).filter(Pedido.id_pedido == id).first()
 
-    def alterar_pedido(self): 
-        pass
+    def alterar_pedido(self, db: Session, id: int, dados: PedidoCreate): 
+        pedido = db.query(Pedido).filter(Pedido.id_pedido == id).first()
+        if not pedido:
+            raise HTTPException(status_code=404, detail="Pedido não encontrado")
+        
+        if dados.periodo is not None:
+            pedido.periodo = dados.periodo
+        if dados.secao_produtos is not None:
+            pedido.secao_produtos = dados.secao_produtos
+        if dados.status is not None:
+            pedido.status = dados.status
+
+        
+        itens_atuais = {item.id_produto: item for item in pedido.itens}
+
+        
+        novos_itens = {item.id_produto: item for item in dados.itens}
+
+        
+        for prod_id in list(itens_atuais):
+            if prod_id not in novos_itens:
+                item = itens_atuais[prod_id]
+                produto = db.query(Produto).filter(Produto.id == prod_id).first()
+                if produto:
+                    produto.estoque_inicial += item.quantidade
+                db.delete(item)
+
+        
+        for prod_id, novo_item in novos_itens.items():
+            produto = db.query(Produto).filter(Produto.id == prod_id).first()
+            if not produto:
+                raise HTTPException(status_code=404, detail=f"Produto {prod_id} não encontrado")
+
+            existente = itens_atuais.get(prod_id)
+            if existente:
+                diff = novo_item.quantidade - existente.quantidade
+                if produto.estoque_inicial < diff:
+                    raise HTTPException(status_code=400, detail=f"Estoque insuficiente para {produto.codigo_barras}")
+                produto.estoque_inicial -= diff
+                existente.quantidade = novo_item.quantidade
+            else:
+                if produto.estoque_inicial < novo_item.quantidade:
+                    raise HTTPException(status_code=400, detail=f"Estoque insuficiente para {produto.codigo_barras}")
+                produto.estoque_inicial -= novo_item.quantidade
+                novo = PedidoItem(
+                    id_pedido=id,
+                    id_produto=prod_id,
+                    quantidade=novo_item.quantidade
+                )
+                db.add(novo)
+
+        db.commit()
+        db.refresh(pedido)
+        return pedido
 
     def deletar_pedido(self, db: Session, id: int):
         pedido = db.query(Pedido).filter(Pedido.id_pedido == id).first()
@@ -86,3 +138,12 @@ class PedidoService:
         db.delete(pedido)
         db.commit()
         return True
+    
+    def patch_status_pedido(self, db: Session, id: int, status: PedidoStatus):
+        pedido = db.query(Pedido).filter(Pedido.id_pedido == id).first()
+        if not pedido:
+            return None
+        pedido.status = status.status
+        db.commit()
+        db.refresh(pedido)
+        return pedido

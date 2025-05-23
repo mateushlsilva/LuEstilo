@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from app.database import Database
 from app.services.pedidoService import PedidoService
-from app.schemas.pedidoSchema import PedidoBase, PedidoRead, PedidoCreate, PedidoRemove
+from app.schemas.pedidoSchema import PedidoBase, PedidoRead, PedidoCreate, PedidoRemove, PedidoStatus
 
 router = APIRouter(prefix="/orders", tags=["Pedidos"])
 service = PedidoService()
@@ -42,3 +42,24 @@ def deletar_pedido(id: int, db: Session = Depends(db.get_db)):
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
     return {"detail": 'Pedido deletado!'}
+
+
+@router.put("/{id}", response_model=PedidoRead)
+def atualizar_pedido(id: int, pedido: PedidoCreate, db: Session = Depends(db.get_db)):
+    try:
+        pedido_atualizado = service.alterar_pedido(db, id, pedido)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if not pedido_atualizado:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+
+    return pedido_atualizado
+
+
+@router.patch("/{id}", response_model=PedidoRead)
+def atualizar_status(id: int, status: PedidoStatus, db: Session = Depends(db.get_db)):
+    pedido = service.patch_status_pedido(db, id, status)
+    if not pedido:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    return pedido
