@@ -25,8 +25,26 @@ class ProdutoService:
         db.refresh(novo_produto)
         return novo_produto
 
-    def pegar_todos_produtos(self):
-        pass
+    def pegar_todos_produtos(
+        self,
+        db: Session,
+        categoria: Optional[str], 
+        preco: Optional[float] , 
+        disponibilidade: Optional[bool],
+        skip: int,
+        limit: int
+    ):
+        query = db.query(Produto)
+
+        if categoria:
+            query = query.filter(Produto.categoria.ilike(f"%{categoria}%"))
+        if preco is not None:
+            query = query.filter(Produto.preco <= preco).order_by(Produto.preco.desc())
+        if disponibilidade is not None:
+            query = query.filter(Produto.disponibilidade==disponibilidade)
+
+        
+        return query.offset(skip).limit(limit).all()
 
     def pegar_produto_id(self):
         pass
