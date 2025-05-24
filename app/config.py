@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     REFRESH_TOKEN_EXPIRE_DAYS: int
+    WHATSAPP_TOKEN: str
+    PHONE_NUMBER_ID: int
 
     class Config:
         env_file = ".env"
