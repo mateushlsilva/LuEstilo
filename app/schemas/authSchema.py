@@ -1,12 +1,13 @@
 from pydantic import BaseModel
 from app.schemas.clienteSchema import ClienteBase
 
-class UserRegister(ClienteBase):
+class UserRegister(BaseModel):
     nome: str
     email: str
-    senha: str
     cpf: str
     telefone: str
+    senha: str
+   
 
 class UserLogin(BaseModel):
     email: str

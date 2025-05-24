@@ -15,7 +15,13 @@ service = ClienteService()
 db = Database()
 
 
-@router.get("/", response_model=List[ClienteRead], dependencies=[Depends(Authorization(['adm']))])
+@router.get("/", response_model=List[ClienteRead], dependencies=[Depends(Authorization(['adm']))], summary="Listar clientes",
+description="Lista todos os clientes cadastrados com filtros opcionais por nome e email. Requer permissão de administrador.",
+responses={
+    200: {"description": "Lista de clientes retornada com sucesso"},
+    403: {"description": "Acesso negado"},
+    404: {"description": "Cliente não encontrado"},
+})
 def listar_clientes(
     nome: Optional[str] = Query(None),
     email: Optional[str] = Query(None),
@@ -25,14 +31,26 @@ def listar_clientes(
 ):  
     return service.pegar_todos_clientes(db, nome, email, skip, limit)
 
-@router.get("/{id}", response_model=ClienteRead)
+@router.get("/{id}", response_model=ClienteRead, summary="Buscar cliente por ID",
+description="Retorna os dados de um cliente específico a partir do ID.",
+responses={
+    200: {"description": "Cliente encontrado"},
+    403: {"description": "Acesso negado"},
+    404: {"description": "Cliente não encontrado"},
+})
 def buscar_cliente(id: int, db: Session = Depends(db.get_db)):
     cliente = service.pegar_cliente_id(db, id)
     if not cliente:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
     return cliente
 
-@router.post("/", response_model=ClienteRead, dependencies=[Depends(Authorization(['adm']))])
+@router.post("/", response_model=ClienteRead, dependencies=[Depends(Authorization(['adm']))], summary="Criar novo cliente",
+description="Cria um novo cliente. Requer permissão de administrador.",
+responses={
+    200: {"description": "Cliente criado com sucesso"},
+    400: {"description": "Erro de validação ou cliente já existente"},
+    403: {"description": "Acesso negado"},
+})
 def criar_cliente(cliente: ClienteBase, db: Session = Depends(db.get_db)):
     validar = Validadores()
     senha = validar.senha(cliente.senha)
@@ -53,7 +71,13 @@ def criar_cliente(cliente: ClienteBase, db: Session = Depends(db.get_db)):
     novo_cliente = service.criar_cliente(db, cliente)
     return novo_cliente
 
-@router.delete("/{id}",  response_model=ClienteRemove)
+@router.delete("/{id}",  response_model=ClienteRemove, summary="Deletar cliente",
+description="Remove um cliente do sistema com base no ID.",
+responses={
+    200: {"description": "Cliente deletado com sucesso"},
+    403: {"description": "Acesso negado"},
+    404: {"description": "Cliente não encontrado"},
+})
 def deletar_cliente(id: int, db: Session = Depends(db.get_db)):
     cliente = service.deletar_cliente(db, id)
     if not cliente:
@@ -61,7 +85,14 @@ def deletar_cliente(id: int, db: Session = Depends(db.get_db)):
     return {"detail": 'Cliente deletado!'}
 
 
-@router.put("/{id}", response_model=ClienteRead)
+@router.put("/{id}", response_model=ClienteRead, summary="Atualizar cliente",
+description="Atualiza os dados de um cliente com base no ID.",
+responses={
+    200: {"description": "Cliente atualizado com sucesso"},
+    400: {"description": "Erro de validação"},
+    403: {"description": "Acesso negado"},
+    404: {"description": "Cliente não encontrado"},
+})
 def atualizar_cliente(id: int, cliente: ClienteBase, db: Session = Depends(db.get_db)):
     validar = Validadores()
     try:
