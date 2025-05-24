@@ -68,8 +68,8 @@ responses={
     200: {"description": "Token renovado com sucesso"},
     401: {"description": "Token inválido ou expirado"},
 })
-def refresh_token(token: str):
-    payload = service.jwt_token.verify_token(token)
+def refresh_token(token: authSchema.RefreshRequest):
+    payload = service.jwt_token.verify_token(token.refresh_token)
     if payload is None:
         raise HTTPException(status_code=401, detail="Token inválido")
     user_id = payload.get("sub")

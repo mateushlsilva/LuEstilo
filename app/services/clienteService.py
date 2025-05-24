@@ -62,7 +62,8 @@ class ClienteService:
         cliente.email = dados.email
         cliente.cpf = dados.cpf
         cliente.telefone = dados.telefone
-        cliente.senha = self.auth.hash_senha(dados.senha)
+        if not self.auth.verificar_senha(dados.senha, cliente.senha):
+            cliente.senha = self.auth.hash_senha(dados.senha)
         cliente.nivel = dados.nivel
 
         db.commit()
