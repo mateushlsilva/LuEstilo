@@ -10,12 +10,16 @@ from app.services.whatsappService import WhatsappService
 router = APIRouter(prefix="/whatsapp", tags=["WhatsApp"], dependencies=[Depends(Authorization(["comum", 'adm']))])
 service = WhatsappService()
 
-@router.post("/", response_model=WhatsappBase, dependencies=[Depends(Authorization(["comum",'adm']))], summary="Manda Mensagem",
-description="Manda mensagem.",
+@router.post("/", response_model=WhatsappBase, dependencies=[Depends(Authorization(["comum",'adm']))], summary="Envio de mensagem via WhatsApp",
+description="""
+Envia uma mensagem utilizando via WhatsApp.
+A requisição deve conter as informações necessárias para o envio,
+como o número do cliente e a mensagem.
+""",
 responses={
-    200: {"description": "Cliente criado com sucesso"},
-    400: {"description": "Erro de validação ou cliente já existente"},
-    403: {"description": "Acesso negado"},
+    200: {"description": "Mensagem enviada com sucesso."},
+    400: {"description": "Erro de validação dos dados ou falha no envio da mensagem."},
+    403: {"description": "Acesso negado. O usuário não tem permissão."},
 })
 def mandar_mensagem(mensagem: WhatsappBase):
     resultado = service.enviar_template(mensagem)

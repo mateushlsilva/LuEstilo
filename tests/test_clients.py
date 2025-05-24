@@ -1,10 +1,11 @@
 import pytest
+from app.config import settings
 
 @pytest.fixture
 def auth_header(client):
     login_response = client.post("/auth/login", json={
-        "email": "mateushls01@gmail.com",
-        "senha": "mariojev"
+        "email": settings.TEST_EMAIL,
+        "senha": settings.TEST_SENHA
     })
     assert login_response.status_code == 200
     token = login_response.json()["access_token"]

@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int
     WHATSAPP_TOKEN: str
     PHONE_NUMBER_ID: int
+    TEST_EMAIL: str
+    TEST_SENHA: str
 
     class Config:
         env_file = ".env"
