@@ -1,3 +1,4 @@
+
 def test_register_client(client):
     response = client.post("/auth/register", json={
         "email": "test@example.com",
