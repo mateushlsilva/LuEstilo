@@ -7,8 +7,8 @@ from app.services.pedidoService import PedidoService
 from app.schemas.pedidoSchema import PedidoBase, PedidoRead, PedidoCreate, PedidoRemove, PedidoStatus
 from app.middleware.Authorization import Authorization
 
-auth = Authorization()
-router = APIRouter(prefix="/orders", tags=["Pedidos"], dependencies=[Depends(auth)])
+
+router = APIRouter(prefix="/orders", tags=["Pedidos"], dependencies=[Depends(Authorization(["comum", 'adm']))])
 service = PedidoService()
 db = Database()
 
@@ -59,7 +59,7 @@ def atualizar_pedido(id: int, pedido: PedidoCreate, db: Session = Depends(db.get
     return pedido_atualizado
 
 
-@router.patch("/{id}", response_model=PedidoRead)
+@router.patch("/{id}", response_model=PedidoRead, dependencies=[Depends(Authorization(['adm']))])
 def atualizar_status(id: int, status: PedidoStatus, db: Session = Depends(db.get_db)):
     pedido = service.patch_status_pedido(db, id, status)
     if not pedido:

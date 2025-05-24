@@ -23,9 +23,9 @@ class AuthService():
             return None
         return db_user
 
-    def create_token(self, user_id: int):
-        access_token = self.jwt_token.create_access_token(data={"sub": str(user_id)})
-        refresh_token = self.jwt_token.create_refresh_token(data={"sub": str(user_id)})
+    def create_token(self, user_id: int, nivel: str):
+        access_token = self.jwt_token.create_access_token(data={"sub": str(user_id), "nivel": nivel})
+        refresh_token = self.jwt_token.create_refresh_token(data={"sub": str(user_id), "nivel": nivel})
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,

@@ -13,6 +13,7 @@ class ProdutoBase(BaseModel):
     estoque_inicial: int
     data_validade: Optional[date]
     imagens: Optional[List[str]]
+    nome: str
 
 
 class ProdutoRemove(BaseModel):

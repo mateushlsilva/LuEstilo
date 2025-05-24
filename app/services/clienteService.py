@@ -15,7 +15,8 @@ class ClienteService:
             email=cliente.email,
             cpf=cliente.cpf,
             telefone=cliente.telefone,
-            senha=senha  
+            senha=senha,  
+            nivel=cliente.nivel
         )
         db.add(novo_cliente)
         db.commit()
@@ -62,6 +63,7 @@ class ClienteService:
         cliente.cpf = dados.cpf
         cliente.telefone = dados.telefone
         cliente.senha = self.auth.hash_senha(dados.senha)
+        cliente.nivel = dados.nivel
 
         db.commit()
         db.refresh(cliente)

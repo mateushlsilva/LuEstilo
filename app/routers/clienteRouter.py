@@ -9,13 +9,13 @@ from app.models.clientesModel import Cliente
 from app.utils.validated import Validadores
 from app.middleware.Authorization import Authorization
 
-auth = Authorization()
-router = APIRouter(prefix="/clients", tags=["Clientes"], dependencies=[Depends(auth)])
+
+router = APIRouter(prefix="/clients", tags=["Clientes"], dependencies=[Depends(Authorization(["comum", 'adm']))])
 service = ClienteService()
 db = Database()
 
 
-@router.get("/", response_model=List[ClienteRead])
+@router.get("/", response_model=List[ClienteRead], dependencies=[Depends(Authorization(['adm']))])
 def listar_clientes(
     nome: Optional[str] = Query(None),
     email: Optional[str] = Query(None),
@@ -32,7 +32,7 @@ def buscar_cliente(id: int, db: Session = Depends(db.get_db)):
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
     return cliente
 
-@router.post("/", response_model=ClienteRead)
+@router.post("/", response_model=ClienteRead, dependencies=[Depends(Authorization(['adm']))])
 def criar_cliente(cliente: ClienteBase, db: Session = Depends(db.get_db)):
     validar = Validadores()
     senha = validar.senha(cliente.senha)

@@ -9,8 +9,8 @@ class UserRegister(ClienteBase):
     telefone: str
 
 class UserLogin(BaseModel):
-    senha: str
     email: str
+    senha: str
 
 class Token(BaseModel):
     access_token: str

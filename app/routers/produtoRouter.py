@@ -9,8 +9,8 @@ from app.models.produtoModel import Produto
 from app.utils.validated import Validadores
 from app.middleware.Authorization import Authorization
 
-auth = Authorization()
-router = APIRouter(prefix="/products", tags=["Produtos"], dependencies=[Depends(auth)])
+
+router = APIRouter(prefix="/products", tags=["Produtos"], dependencies=[Depends(Authorization(["comum", 'adm']))])
 service = ProdutoService()
 db = Database()
 
@@ -33,7 +33,7 @@ def buscar_produto(id: int, db: Session = Depends(db.get_db)):
         raise HTTPException(status_code=404, detail="Produto não encontrado")
     return produto
 
-@router.post("/", response_model=ProdutoRead)
+@router.post("/", response_model=ProdutoRead, dependencies=[Depends(Authorization(['adm']))])
 def criar_produto(produto: ProdutoBase, db: Session = Depends(db.get_db)):
    
     if db.query(Produto).filter_by(codigo_barras=produto.codigo_barras).first():
@@ -42,7 +42,7 @@ def criar_produto(produto: ProdutoBase, db: Session = Depends(db.get_db)):
     novo_produto = service.criar_produto(db, produto)
     return novo_produto
 
-@router.delete("/{id}",  response_model=ProdutoRemove)
+@router.delete("/{id}",  response_model=ProdutoRemove, dependencies=[Depends(Authorization(['adm']))])
 def deletar_produto(id: int, db: Session = Depends(db.get_db)):
     produto = service.deletar_produto(db, id)
     if not produto:
@@ -50,7 +50,7 @@ def deletar_produto(id: int, db: Session = Depends(db.get_db)):
     return {"detail": 'Produto deletado!'}
 
 
-@router.put("/{id}", response_model=ProdutoRead)
+@router.put("/{id}", response_model=ProdutoRead, dependencies=[Depends(Authorization(['adm']))])
 def atualizar_produto(id: int, produto: ProdutoBase, db: Session = Depends(db.get_db)):
     try:   
         produto_atualizado = service.alterar_produto(db, id, produto)

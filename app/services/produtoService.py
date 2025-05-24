@@ -18,7 +18,8 @@ class ProdutoService:
             imagens=produto.imagens,
             preco=produto.preco,
             secao=produto.secao,
-            valor_venda=produto.valor_venda
+            valor_venda=produto.valor_venda,
+            nome=produto.nome
         )
         db.add(novo_produto)
         db.commit()
@@ -69,6 +70,7 @@ class ProdutoService:
         produto.estoque_inicial = dados.estoque_inicial
         produto.data_validade = dados.data_validade
         produto.imagens = dados.imagens
+        produto.nome = dados.nome
 
         db.commit()
         db.refresh(produto)
