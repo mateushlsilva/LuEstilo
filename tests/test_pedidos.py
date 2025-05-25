@@ -17,10 +17,10 @@ def test_criar_pedido(client, auth_header):
         "periodo": "manhã",
         "secao_produtos": "eletrônica",
         "status": "pendente",
-        "id_cliente": 3,
+        "id_cliente": 1,
         "itens": [
             {
-            "id_produto": 10,
+            "id_produto": 1,
             "quantidade": 1
             }
         ]
@@ -50,10 +50,10 @@ def test_atualizar_pedido(client, auth_header):
         "periodo": "noite",
         "secao_produtos": "eletrônica",
         "status": "pendente",
-        "id_cliente": 3,
+        "id_cliente": 1,
         "itens": [
             {
-            "id_produto": 10,
+            "id_produto": 1,
             "quantidade": 1
             }
         ]

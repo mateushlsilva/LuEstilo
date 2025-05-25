@@ -44,7 +44,7 @@ def upgrade() -> None:
     sa.Column('secao', sa.String(), nullable=True),
     sa.Column('estoque_inicial', sa.Integer(), nullable=True),
     sa.Column('data_validade', sa.Date(), nullable=True),
-    sa.Column('imagens', sa.String(), nullable=True),
+    sa.Column('imagens', sa.ARRAY(sa.String()), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_produtos_codigo_barras'), 'produtos', ['codigo_barras'], unique=False)

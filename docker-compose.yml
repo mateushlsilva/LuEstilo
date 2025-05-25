@@ -1,0 +1,51 @@
+version: "3.8"
+
+networks:
+  minha-rede:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "exemplo"
+      POSTGRES_DB: "postgres"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - minha-rede
+
+  app:
+    image: mateushlsilva/lu-estilo:latest
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SQLALCHEMY_DATABASE_URL: postgresql://postgres:exemplo@postgres:5432/postgres
+    networks:
+      - minha-rede
+
+  migrate:
+    image: mateushlsilva/lu-estilo:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SQLALCHEMY_DATABASE_URL: postgresql://postgres:exemplo@postgres:5432/postgres
+    entrypoint: ["/bin/sh", "-c", "alembic upgrade head && python3 create_admin.py"]
+    networks:
+      - minha-rede
+
+
+volumes:
+  postgres-data:
