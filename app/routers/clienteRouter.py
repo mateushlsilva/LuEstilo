@@ -38,7 +38,9 @@ responses={
     403: {"description": "Acesso negado"},
     404: {"description": "Cliente não encontrado"},
 })
-def buscar_cliente(id: int, db: Session = Depends(db.get_db)):
+def buscar_cliente(id: int, user=Depends(Authorization(['comum', 'adm'])), db: Session = Depends(db.get_db)):
+    if user["nivel"] != "adm" and int(user["sub"]) != id:
+        raise HTTPException(status_code=403, detail="Acesso negado")
     cliente = service.pegar_cliente_id(db, id)
     if not cliente:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
@@ -78,7 +80,9 @@ responses={
     403: {"description": "Acesso negado"},
     404: {"description": "Cliente não encontrado"},
 })
-def deletar_cliente(id: int, db: Session = Depends(db.get_db)):
+def deletar_cliente(id: int, user=Depends(Authorization(['comum', 'adm'])), db: Session = Depends(db.get_db)):
+    if user["nivel"] != "adm" and int(user["sub"]) != id:
+        raise HTTPException(status_code=403, detail="Acesso negado")
     cliente = service.deletar_cliente(db, id)
     if not cliente:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
@@ -93,7 +97,9 @@ responses={
     403: {"description": "Acesso negado"},
     404: {"description": "Cliente não encontrado"},
 })
-def atualizar_cliente(id: int, cliente: ClienteBase, db: Session = Depends(db.get_db)):
+def atualizar_cliente(id: int, cliente: ClienteBase, user=Depends(Authorization(['comum', 'adm'])), db: Session = Depends(db.get_db)):
+    if user["nivel"] != "adm" and int(user["sub"]) != id:
+        raise HTTPException(status_code=403, detail="Acesso negado")
     validar = Validadores()
     try:
         if validar.senha(cliente.senha) == False:

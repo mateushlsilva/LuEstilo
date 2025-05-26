@@ -39,9 +39,13 @@ def listar_pedidos(
     cliente: Optional[str] = Query(None),
     skip: int = 0,
     limit: int = 10,
+    user=Depends(Authorization(['comum', 'adm'])),
     db: Session = Depends(db.get_db)
 ):
-    return service.pegar_todos_pedidos(db, periodo, secao_produtos, id_pedido, status, cliente, skip, limit)
+    cliente_id = None
+    if user["nivel"] != "adm":
+        cliente_id = int(user["sub"])
+    return service.pegar_todos_pedidos(db, periodo, secao_produtos, id_pedido, status, cliente, cliente_id, skip, limit)
 
 @router.get("/{id}", response_model=PedidoRead, summary="Buscar pedido por ID",
 description="Busca um pedido específico pelo seu ID.",
@@ -50,10 +54,12 @@ responses={
     404: {"description": "Pedido não encontrado"},
     403: {"description": "Acesso negado"},
 })
-def buscar_pedidos(id: int, db: Session = Depends(db.get_db)):
+def buscar_pedidos(id: int, user=Depends(Authorization(['comum', 'adm'])), db: Session = Depends(db.get_db)):
     pedidos = service.pegar_pedidos_id(db, id)
     if not pedidos:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    if user["nivel"] != "adm" and pedidos.id_cliente != int(user["sub"]):
+        raise HTTPException(status_code=403, detail="Acesso negado")
     return pedidos
 
 @router.delete("/{id}",  response_model=PedidoRemove, summary="Deletar pedido",
@@ -63,8 +69,11 @@ responses={
     404: {"description": "Pedido não encontrado"},
     403: {"description": "Acesso negado"},
 })
-def deletar_pedido(id: int, db: Session = Depends(db.get_db)):
-    pedido = service.deletar_pedido(db, id)
+def deletar_pedido(id: int, user=Depends(Authorization(['comum', 'adm'])), db: Session = Depends(db.get_db)):
+    id_client = None
+    if user["nivel"] != "adm":
+        id_client = int(user["sub"])
+    pedido = service.deletar_pedido(db, id, id_client)
     if not pedido:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
     return {"detail": 'Pedido deletado!'}
@@ -79,9 +88,12 @@ responses={
     403: {"description": "Acesso negado"},
 }
 )
-def atualizar_pedido(id: int, pedido: PedidoCreate, db: Session = Depends(db.get_db)):
+def atualizar_pedido(id: int, pedido: PedidoCreate, user=Depends(Authorization(['comum', 'adm'])), db: Session = Depends(db.get_db)):
     try:
-        pedido_atualizado = service.alterar_pedido(db, id, pedido)
+        id_client = None
+        if user["nivel"] != "adm":
+            id_client = int(user["sub"])
+        pedido_atualizado = service.alterar_pedido(db, id, pedido, id_client)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

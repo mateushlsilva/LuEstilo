@@ -51,6 +51,7 @@ class PedidoService:
         id_pedido: Optional[int],
         status: Optional[str],
         cliente: Optional[str],
+        cliente_id: Optional[int],
         skip: int,
         limit: int
     ):
@@ -66,8 +67,11 @@ class PedidoService:
         for filtro in filtros:
             if filtro is not None:
                 query = query.filter(filtro)
+        
+        if cliente_id:
+            query = query.filter(Pedido.id_cliente == cliente_id)
 
-        if cliente:
+        elif cliente:
             query = query.join(Pedido.cliente).filter(Cliente.nome.ilike(f"%{cliente}%"))
 
         return query.offset(skip).limit(limit).all()
@@ -75,10 +79,13 @@ class PedidoService:
     def pegar_pedidos_id(self, db: Session, id: int):
         return db.query(Pedido).filter(Pedido.id_pedido == id).first()
 
-    def alterar_pedido(self, db: Session, id: int, dados: PedidoCreate): 
+    def alterar_pedido(self, db: Session, id: int, dados: PedidoCreate, id_client: Optional[int]): 
         pedido = db.query(Pedido).filter(Pedido.id_pedido == id).first()
         if not pedido:
             raise HTTPException(status_code=404, detail="Pedido não encontrado")
+        
+        if id_client != None and pedido.id_cliente != id_client:
+            raise HTTPException(status_code=403, detail="Acesso negado")
         
         if dados.periodo is not None:
             pedido.periodo = dados.periodo
@@ -130,10 +137,12 @@ class PedidoService:
         db.refresh(pedido)
         return pedido
 
-    def deletar_pedido(self, db: Session, id: int):
+    def deletar_pedido(self, db: Session, id: int, id_client: Optional[int]):
         pedido = db.query(Pedido).filter(Pedido.id_pedido == id).first()
         if not pedido:
             return None
+        if id_client != None and pedido.id_cliente != id_client:
+            raise HTTPException(status_code=403, detail="Acesso negado")
 
         db.delete(pedido)
         db.commit()
