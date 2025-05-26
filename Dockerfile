@@ -20,6 +20,7 @@ ENV TEST_EMAIL=admin@example.com
 ENV TEST_SENHA=admin123
 
 
+
 EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
